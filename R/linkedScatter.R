@@ -21,6 +21,7 @@
 NULL
 
 #' @rdname linkedScatter
+#' @export
 linkedScatterSidebarTabUI <- function(id,menu_item_name,tab_name) {
         ns <- NS(id)
 
@@ -30,6 +31,7 @@ linkedScatterSidebarTabUI <- function(id,menu_item_name,tab_name) {
 }
 
 #' @rdname linkedScatter
+#' @export
 linkedScatterSidebarContentUI <- function(id,menu_item_name,tab_name, data) {
         ns <- NS(id)
         df <- as.data.frame(data)
@@ -71,6 +73,7 @@ linkedScatterSidebarContentUI <- function(id,menu_item_name,tab_name, data) {
 }
 
 #' @rdname linkedScatter
+#' @export
 linkedScatterBodyUI <- function(id,tab_name) {
         ns <- NS(id)
 
@@ -94,6 +97,7 @@ linkedScatterBodyUI <- function(id,tab_name) {
 }
 
 #' @rdname linkedScatter
+#' @export
 linkedScatter <- function(input, output, session, data) {
 
         left_x <- reactive({input$left_x})
@@ -119,6 +123,7 @@ linkedScatter <- function(input, output, session, data) {
 }
 
 #' @rdname linkedScatter
+#' @export
 scatterPlot <- function(data, cols) {
         ggplot(data, aes_string(x = cols[1], y = cols[2])) +
                 geom_point(aes(color = selected_)) +

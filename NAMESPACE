@@ -2,6 +2,10 @@
 
 export(fluidDashboardBody)
 export(linkedScatter)
+export(linkedScatterBodyUI)
+export(linkedScatterSidebarContentUI)
+export(linkedScatterSidebarTabUI)
+export(scatterPlot)
 import(ggplot2)
 import(htmltools)
 import(shiny)
