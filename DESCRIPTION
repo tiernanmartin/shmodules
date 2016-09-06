@@ -1,0 +1,23 @@
+Package: shmodules
+Type: Package
+Title: A Collection of Shiny Modules for Data Exploration and Visualization
+Version: 0.0.1
+Author: Tiernan Martin
+Maintainer: Tiernan Martin <tiernan.martin@gmail.com>
+Description: A collection of shiny modules for exploring and visualizing data.
+    This primary purpose of this package is to make it easy to access successful
+    module patterns and quickly add them to new shiny projects.
+License: GPL-2
+Encoding: UTF-8
+LazyData: true
+Depends:
+    R (>= 3.0)
+Imports:
+    utils,
+    shiny (>= 0.13.2),
+    shinydashboard (>= 0.5.1),
+    htmltools (>= 0.2.6),
+    dplyr (>= 0.5.0),
+Suggests:
+    DT (>= 0.2)
+RoxygenNote: 5.0.1
