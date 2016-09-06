@@ -1,6 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
-### shmodules
+shmodules
+=========
 
 This package is a collection of functions that act as "building blocks" for shiny modules. The package is primarily for internal use.
 
