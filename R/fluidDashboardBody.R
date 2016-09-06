@@ -1,4 +1,4 @@
-#' @title A Dashboard Body that Automatically Resizes when the Sidebar is Toggled
+#' @title A dashboard body that automatically resizes when the sidebar is toggled
 #'
 #' @description \code{fluidDashboardBody} inserts a javascript "trigger "at the beginning of
 #' the standard \code{\link{dashboardBody}} outuput, which tells the content of the dashboard

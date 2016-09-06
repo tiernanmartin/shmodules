@@ -2,7 +2,7 @@
 % Please edit documentation in R/fluidDashboardBody.R
 \name{fluidDashboardBody}
 \alias{fluidDashboardBody}
-\title{A Dashboard Body that Automatically Resizes when the Sidebar is Toggled}
+\title{A dashboard body that automatically resizes when the sidebar is toggled}
 \usage{
 fluidDashboardBody(...)
 }
