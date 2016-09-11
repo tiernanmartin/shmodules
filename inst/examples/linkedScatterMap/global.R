@@ -117,10 +117,10 @@ linkedScatterMap <- function(input, output, session, sp_rx, plotly_event_rx) {
         var <- reactive({input$var})
 
         colorpal <- reactive({
-                # colorNumeric('Spectral',sp_rx()[[var()]])
+                myYlOrRd <- RColorBrewer::brewer.pal(9, "YlOrRd")[2:7]
 
                 if(is.numeric(sp_rx()[[var()]])){
-                        colorNumeric('Spectral',sp_rx()[[var()]])
+                        colorNumeric(myYlOrRd,sp_rx()[[var()]])
                 }
                 else{
                         colorFactor('Set1',sp_rx()[[var()]] %>% as.character() %>% factor)
@@ -140,7 +140,9 @@ linkedScatterMap <- function(input, output, session, sp_rx, plotly_event_rx) {
                 pal <- colorNumeric('Spectral',sp_rx_id()[[var1]])
                 myLflt() %>%
                         addPolygons(data = sp_rx_id(),
-                                    opacity = 0,
+                                    color = col2hex("white"),
+                                    opacity = 1,
+                                    weight = .5,
                                     fillColor = pal(sp_rx_id()[[var1]]),
                                     fillOpacity = .85,
                                     smoothFactor = 0,
@@ -160,7 +162,9 @@ linkedScatterMap <- function(input, output, session, sp_rx, plotly_event_rx) {
                                 clearShapes() %>%
                                 clearControls() %>%
                                 addPolygons(data = sp_rx_id(),
-                                            opacity = 0,
+                                            color = col2hex("white"),
+                                            opacity = 1,
+                                            weight = .5,
                                             fillColor = pal(sp_rx_id()[[var()]]),
                                             fillOpacity = .85,
                                             smoothFactor = 0) %>%
@@ -169,18 +173,19 @@ linkedScatterMap <- function(input, output, session, sp_rx, plotly_event_rx) {
                                 removeLayersControl()
                 } else{
                         leafletProxy(ns('map')) %>%
-                                # clearShapes() %>%
-                                clearGroup(group = 'main') %>%
+                                clearShapes() %>%
                                 clearControls() %>%
                                 addPolygons(data = sp_rx_id(),
-                                            opacity = 0,
+                                            color = col2hex("white"),
+                                            opacity = 1,
+                                            weight = .5,
                                             fillColor = pal(sp_rx_id()[[var()]]),
                                             fillOpacity = .85,
                                             smoothFactor = 0) %>%
                                 addLegend(position = "bottomleft",
                                           pal = pal, values = sp_rx_id()[[var()]]) %>%
                                 clearGroup(group = 'sub') %>%
-                                addPolygons(data = sub(), fill = FALSE, color = '#00FFFF',
+                                addPolygons(data = sub(), fillOpacity = 0, color = '#00FFFF',
                                             opacity = 1, group = 'sub') %>%
                                 addLayersControl(baseGroups = 'main',overlayGroups = 'sub',options = layersControlOptions(collapsed = TRUE)) %>%
                                 removeLayersControl()
