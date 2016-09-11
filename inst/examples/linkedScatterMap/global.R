@@ -1,6 +1,7 @@
 # library(sp)
 library(rgdal)
 library(plotly)
+library(gplots)
 library(ggplot2)
 library(GISTools)
 library(magrittr)
@@ -9,6 +10,7 @@ library(plyr)
 library(dplyr)
 library(shinydashboard)
 library(leaflet)
+
 library(shmodules)
 
 data(newhaven)
@@ -18,9 +20,15 @@ crs_proj <- CRS("+init=epsg:4326")
 proj4string(tracts) <- proj4string(blocks)
 
 tracts %<>% spTransform(crs_proj)
+blocks %<>% spTransform(crs_proj)
 
 tracts@data %<>% mutate_at(vars(contains('P_')), funs(round_any(. * .01,.0001)))
+blocks@data %<>% mutate_at(vars(contains('P_')), funs(round_any(. * .01,.0001)))
 
+proj_light_grey <- col2hex("grey75")
+proj_grey <- col2hex("grey50")
+proj_dark_grey <- col2hex("grey25")
+proj_orange <- '#D59C40'
 
 myLflt <- function(){
         leaflet() %>%
@@ -53,7 +61,13 @@ linkedScatterMapSidebarTabContentUI <- function(id,menu_item_name,tab_name, sp) 
                                                          choices = names(df)
                                           )),
                                  fluidRow(width = 12,
-                                          plotlyOutput(ns('scatter'), width = "auto"))
+                                          plotlyOutput(ns('scatter'), width = "auto")),
+                                 fluidRow(width = 12,
+                                          column(width = 6,
+                                                 selectizeInput(inputId = ns('x_axis'),label = 'X Axis',choices = names(df))),
+                                          column(width = 6,
+                                                 selectizeInput(inputId = ns('y_axis'),label = 'Y Axis',choices = names(df)))
+                                          )
 
                 )
         )
@@ -66,6 +80,7 @@ linkedScatterMapBodyUI <- function(id,tab_name) {
         ns <- NS(id)
 
         tabItem(tabName = tab_name,
+
                 tags$head(
                         tags$style(
                                 HTML('
@@ -81,34 +96,57 @@ linkedScatterMapBodyUI <- function(id,tab_name) {
                 tags$div(class = 'outer', leafletOutput(ns("map"),height = "100%", width = '100%')
                 )
 
+
         )
 
 
 }
 
-linkedScatterMap <- function(input, output, session, id2, sp_rx) {
+linkedScatterMap <- function(input, output, session, sp_rx, plotly_event_rx) {
 
-        ns <- NS(id2)
+        ns <- session$ns
 
         # Reactives
 
+        sp_rx_id <- reactive({
+                sp_id <- sp_rx()
+                sp_id@data <- cbind(sp_id@data,KEY = rownames(sp_id@data))
+                return(sp_id)
+        })
+
         var <- reactive({input$var})
 
-        colorpal <- reactive({colorNumeric('Spectral',sp_rx()[[var()]])})
+        colorpal <- reactive({
+                # colorNumeric('Spectral',sp_rx()[[var()]])
+
+                if(is.numeric(sp_rx()[[var()]])){
+                        colorNumeric('Spectral',sp_rx()[[var()]])
+                }
+                else{
+                        colorFactor('Set1',sp_rx()[[var()]] %>% as.character() %>% factor)
+                }
+
+                })
+
+        x_axis <- reactive({input$x_axis %>% as.character() %>% toupper()})
+
+        y_axis <- reactive({input$y_axis %>% as.character() %>% toupper()})
 
 
         # Map
         output$map <- renderLeaflet({
 
-                pal <- colorNumeric('Spectral',sp_rx()$P_VACANT)
+                var1 <- names(sp_rx_id())[[1]]
+                pal <- colorNumeric('Spectral',sp_rx_id()[[var1]])
                 myLflt() %>%
-                        addPolygons(data = sp_rx(),
+                        addPolygons(data = sp_rx_id(),
                                     opacity = 0,
-                                    fillColor = ~pal(P_VACANT),
+                                    fillColor = pal(sp_rx_id()[[var1]]),
                                     fillOpacity = .85,
-                                    smoothFactor = 0) %>%
+                                    smoothFactor = 0,
+                                    group = 'main') %>%
                         addLegend(position = "bottomleft",
-                                  pal = pal, values = sp_rx()$P_VACANT)
+                                  pal = pal, values = sp_rx_id()[[var1]])
 
         })
 
@@ -116,45 +154,140 @@ linkedScatterMap <- function(input, output, session, id2, sp_rx) {
         observe({
                 pal <- colorpal()
 
-                map_id <- ns('map')
+                if(is.null(sub())){
+                        leafletProxy(ns('map')) %>%
+                                # clearShapes() %>%
+                                clearShapes() %>%
+                                clearControls() %>%
+                                addPolygons(data = sp_rx_id(),
+                                            opacity = 0,
+                                            fillColor = pal(sp_rx_id()[[var()]]),
+                                            fillOpacity = .85,
+                                            smoothFactor = 0) %>%
+                                addLegend(position = "bottomleft",
+                                          pal = pal, values = sp_rx_id()[[var()]]) %>%
+                                removeLayersControl()
+                } else{
+                        leafletProxy(ns('map')) %>%
+                                # clearShapes() %>%
+                                clearGroup(group = 'main') %>%
+                                clearControls() %>%
+                                addPolygons(data = sp_rx_id(),
+                                            opacity = 0,
+                                            fillColor = pal(sp_rx_id()[[var()]]),
+                                            fillOpacity = .85,
+                                            smoothFactor = 0) %>%
+                                addLegend(position = "bottomleft",
+                                          pal = pal, values = sp_rx_id()[[var()]]) %>%
+                                clearGroup(group = 'sub') %>%
+                                addPolygons(data = sub(), fill = FALSE, color = '#00FFFF',
+                                            opacity = 1, group = 'sub') %>%
+                                addLayersControl(baseGroups = 'main',overlayGroups = 'sub',options = layersControlOptions(collapsed = TRUE)) %>%
+                                removeLayersControl()
+                }
 
-                leafletProxy(map_id) %>%
-                        clearShapes() %>%
-                        clearControls() %>%
-                        addPolygons(data = sp_rx(),
-                                    opacity = 0,
-                                    fillColor = pal(sp_rx()[[var()]]),
-                                    fillOpacity = .85,
-                                    smoothFactor = 0) %>%
-                        addLegend(position = "bottomleft",
-                                  pal = pal, values = sp_rx()[[var()]])
+
         })
 
         # Scatter Plot
         output$scatter <- renderPlotly({
 
-                key <- sp_rx()$ARCINFOFPS # This will uniquely identify sp for Plotly
+                # key <- sp_rx()$ARCINFOFPS # This will uniquely identify sp for Plotly
 
-                p1a <- ggplot(sp_rx()@data) +
-                        geom_point(aes(x = P_VACANT,y = P_RENTROCC, key = key)) +
-                        theme_minimal(base_size = 14) +
-                        scale_y_continuous(labels = scales::percent) +
-                        scale_x_continuous(labels = scales::percent) +
-                        xlab('Vacancy') + ylab('Renter-Occupancy')
+                # gg_df <- cbind(sp_rx()@data,KEY = rownames(sp_rx()@data))
 
-                g <- ggplotly(p1a, source = 'source') %>%
+
+
+                gg <- ggplot(sp_rx_id()@data) +
+                        geom_point(aes(x = sp_rx_id()[[x_axis()]],y = sp_rx_id()[[y_axis()]], key = KEY),color = proj_orange,alpha = .75) +
+                        xlab(x_axis()) + ylab(y_axis()) +
+                        # scale_y_continuous(labels = scales::percent) +
+                        # scale_x_continuous(labels = scales::percent) +
+                        theme(plot.background = element_rect(fill = "transparent"),
+                              panel.background = element_rect(fill = "transparent"),
+                              text = element_text(color = "white"),
+                              axis.text =  element_text(color = proj_grey),
+                              axis.ticks = element_blank(),
+                              panel.grid.major = element_line(color = proj_grey),
+                              panel.grid.minor = element_line(color = proj_grey, size = 2),
+                              axis.line.x = element_line(color = "white"),
+                              axis.line.y = element_line(color = "white"))
+
+                g <- ggplotly(gg, source = 'source') %>%
                         layout(dragmode = 'select',
-                               margin = list(l = 100),
-                               font = list(family = 'Open Sans', size = 16))
+                               margin = list(
+                                       l = 60,
+                                       r = 50,
+                                       b = 50,
+                                       t = 50
+                               ),
+                               font = list(family = 'Open Sans', size = 16)) %>%
+                        config(displaylogo = FALSE,displayModeBar = FALSE)
 
                 # Need to manually set the hoverinfo to avoid the key appearing in it
                 build <- plotly_build(g)
 
-                build$data[[1]]$text <- paste0('Tract ID: ', as.character(sp_rx()$ARCINFOFPS), '<br>',
-                                               'Vacancy Rate: ', as.character(sp_rx()$P_VACANT),'<br>',
-                                               'Renter-Occupancy Rate: ', as.character(sp_rx()$P_RENTROCC))
+                build$data[[1]]$text <- paste0(x_axis(),': ', as.character(sp_rx_id()[[x_axis()]]),'<br>',
+                                               y_axis(),': ', as.character(sp_rx_id()[[y_axis()]]),'<br>'
+                                               )
 
                 build
 
         })
-}
+
+        # Graph-Map Interaction
+
+        sub <- reactive({
+
+                if (is.null(plotly_event_rx())) {
+
+                        return(NULL) # do nothing
+
+                } else {
+
+                        sp_sel <- plotly_event_rx()[['key']]
+
+                        if (length(sp_sel) == 0) {
+
+                                sp_sel <- 'abcdefg' # a hack but it's working - set to something that can't be selected
+
+                        }
+
+                        if (!(sp_sel %in% sp_rx_id()[['KEY']])) {
+
+                                return(NULL) # if there is not a match, do nothing as well
+
+                        } else {
+
+                                # Give back a sp data frame of the selected sp_rx_id
+                                sub <- sp_rx_id()[which(sp_rx_id()[['KEY']] %in% sp_sel), ]
+
+                                return(sub)
+
+                        }
+
+                }
+
+        })
+
+
+        # observe({
+        #
+        #         shiny::req(sub()) # Do this if sub() is not null
+        #         shiny::req(var())
+        #
+        #         leafletProxy(ns('map')) %>%
+        #                 clearGroup(group = 'sub') %>%
+        #                 addPolygons(data = sub(), fill = FALSE, color = '#00FFFF',
+        #                             opacity = 1, group = 'sub') %>%
+        #                 addLayersControl(baseGroups = 'main',overlayGroups = 'sub',options = layersControlOptions(collapsed = TRUE))
+        #                 # fitBounds(lng1 = bbox(sub())[1],
+        #                 #           lat1 = bbox(sub())[2],
+        #                 #           lng2 = bbox(sub())[3],
+        #                 #           lat2 = bbox(sub())[4])
+        #
+        # })
+
+
+
+        }
