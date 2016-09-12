@@ -38,6 +38,35 @@ myLflt <- function(){
                 )
 }
 
+checkboxInputStyle <- function (inputId, label, value = FALSE, width = NULL, cssStyle = NULL){
+        value <- restoreInput(id = inputId, default = value)
+        inputTag <- tags$input(id = inputId, type = "checkbox")
+        if (!is.null(value) && value)
+                inputTag$attribs$checked <- "checked"
+        div(class = "form-group shiny-input-container",
+            style = paste0(
+                    ifelse(!is.null(width),paste0("width: ", validateCssUnit(width)),"")," ",
+                    ifelse(!is.null(cssStyle),cssStyle,"")
+            ),
+            div(class = "checkbox",
+                tags$label(inputTag, tags$span(label))))
+}
+
+columnStyle <- function(width, ..., offset = 0, cssStyle = NULL){
+        if (!is.numeric(width) || (width < 1) || (width > 12))
+                stop("column width must be between 1 and 12")
+        colClass <- paste0("col-sm-", width)
+        if (offset > 0)
+                colClass <- paste0(colClass, " col-sm-offset-", offset)
+        div(class = colClass,
+            style = paste0(
+                    ifelse(!is.null(cssStyle),
+                           cssStyle,
+                           "")),
+            ...)
+}
+
+
 linkedScatterMapSidebarTabUI <- function(id,menu_item_name,tab_name) {
         ns <- NS(id)
 
@@ -52,21 +81,38 @@ linkedScatterMapSidebarTabContentUI <- function(id,menu_item_name,tab_name, sp) 
         df <- as.data.frame(sp@data)
         shiny::req(df)
 
-        cond <- paste0("input.menu == '",tab_name,"'") # the 'menu' part of 'input.menu' references the 'id' argument of `sidebarMenu` in app.R
+        cond_tab <- paste0("input.menu == '",tab_name,"'") # the 'menu' part of 'input.menu' references the 'id' argument of `sidebarMenu` in app.R
+        cond_linked_x_F <- sprintf("input['%s'] == false", ns("linked_x"))
+        cond_linked_x_T <- sprintf("input['%s'] == true", ns("linked_x"))
+
         cols <- df %>% select_if(is.numeric) %>% names # note: requires numeric variables (ideal for scatter plotting)
         tagList(
-                conditionalPanel(condition = cond,
+                conditionalPanel(condition = cond_tab,
                                  fluidRow(width = 12,
-                                          selectizeInput(inputId = ns('var'),label = 'Select a variable',
-                                                         choices = names(df)
-                                          )),
+                                          columnStyle(
+                                                  width = 9,
+                                                  selectizeInput(inputId = ns('var'),
+                                                                 label = 'Select a variable',
+                                                                 choices = names(df)
+                                                 )),
+                                          columnStyle(
+                                                  width = 3,
+                                                  checkboxInputStyle(inputId = ns('linked_x'), label = 'Set x-axis', value = TRUE,cssStyle = "padding: 0px;"),
+                                                  cssStyle = 'padding: 0px;')
+                                          ),
                                  fluidRow(width = 12,
                                           plotlyOutput(ns('scatter'), width = "auto")),
                                  fluidRow(width = 12,
-                                          column(width = 6,
-                                                 selectizeInput(inputId = ns('x_axis'),label = 'X Axis',choices = names(df))),
-                                          column(width = 6,
-                                                 selectizeInput(inputId = ns('y_axis'),label = 'Y Axis',choices = names(df)))
+                                          conditionalPanel(condition = cond_linked_x_T,
+                                                           column(width = 6,
+                                                                  selectizeInput(inputId = ns('y_axis_linked'),label = 'Y:',choices = names(df)))
+                                          ),
+                                          conditionalPanel(condition = cond_linked_x_F,
+                                                           column(width = 6,
+                                                                  selectizeInput(inputId = ns('y_axis'),label = 'Y:',choices = names(df))),
+                                                           column(width = 6,
+                                                                  selectizeInput(inputId = ns('x_axis'),label = 'X:',choices = names(df)))
+                                                           )
                                           )
 
                 )
@@ -128,9 +174,53 @@ linkedScatterMap <- function(input, output, session, sp_rx, plotly_event_rx) {
 
                 })
 
-        x_axis <- reactive({input$x_axis %>% as.character() %>% toupper()})
+        x_axis <- reactive({
 
-        y_axis <- reactive({input$y_axis %>% as.character() %>% toupper()})
+                if(linked_x()){
+                        var() %>%as.character() %>% toupper()
+                }else{
+                        input$x_axis %>% as.character() %>% toupper()
+                }
+                })
+
+        y_axis_linked <- reactive({input$y_axis_linked %>% as.character() %>% toupper()})
+
+        y_axis <- reactive({
+                input$y_axis %>% as.character() %>% toupper()
+                })
+
+        y_axis_control <- reactive({
+
+                if(linked_x()){
+                        input$y_axis_linked %>% as.character() %>% toupper()
+                }else{
+                        input$y_axis %>% as.character() %>% toupper()
+                }
+
+                })
+
+        linked_x <- reactive({input$linked_x})
+
+        # Rendered/Updated UI
+
+        observeEvent(linked_x(),{
+                if(!linked_x()){
+                        updateSelectizeInput(session = session,
+                                             inputId = 'y_axis',
+                                             label = "Y:",
+                                             choices = names(sp_rx()),
+                                             selected = y_axis_linked())
+                }
+                else{
+                        updateSelectizeInput(session = session,
+                                             inputId = 'y_axis_linked',
+                                             label = "Y:",
+                                             choices = names(sp_rx()),
+                                             selected = y_axis())
+                }
+
+        })
+
 
 
         # Map
@@ -147,7 +237,7 @@ linkedScatterMap <- function(input, output, session, sp_rx, plotly_event_rx) {
                                     fillOpacity = .85,
                                     smoothFactor = 0,
                                     group = 'main') %>%
-                        addLegend(position = "bottomleft",
+                        addLegend(position = "bottomleft", opacity = .85,
                                   pal = pal, values = sp_rx_id()[[var1]])
 
         })
@@ -168,7 +258,7 @@ linkedScatterMap <- function(input, output, session, sp_rx, plotly_event_rx) {
                                             fillColor = pal(sp_rx_id()[[var()]]),
                                             fillOpacity = .85,
                                             smoothFactor = 0) %>%
-                                addLegend(position = "bottomleft",
+                                addLegend(position = "bottomleft", opacity = .85,
                                           pal = pal, values = sp_rx_id()[[var()]]) %>%
                                 removeLayersControl()
                 } else{
@@ -182,7 +272,7 @@ linkedScatterMap <- function(input, output, session, sp_rx, plotly_event_rx) {
                                             fillColor = pal(sp_rx_id()[[var()]]),
                                             fillOpacity = .85,
                                             smoothFactor = 0) %>%
-                                addLegend(position = "bottomleft",
+                                addLegend(position = "bottomleft", opacity = .85,
                                           pal = pal, values = sp_rx_id()[[var()]]) %>%
                                 clearGroup(group = 'sub') %>%
                                 addPolygons(data = sub(), fillOpacity = 0, color = '#00FFFF',
@@ -204,8 +294,8 @@ linkedScatterMap <- function(input, output, session, sp_rx, plotly_event_rx) {
 
 
                 gg <- ggplot(sp_rx_id()@data) +
-                        geom_point(aes(x = sp_rx_id()[[x_axis()]],y = sp_rx_id()[[y_axis()]], key = KEY),color = proj_orange,alpha = .75) +
-                        xlab(x_axis()) + ylab(y_axis()) +
+                        geom_point(aes(x = sp_rx_id()[[x_axis()]],y = sp_rx_id()[[y_axis_control()]], key = KEY),color = proj_orange,alpha = .75) +
+                        xlab(x_axis()) + ylab(y_axis_control()) +
                         # scale_y_continuous(labels = scales::percent) +
                         # scale_x_continuous(labels = scales::percent) +
                         theme(plot.background = element_rect(fill = "transparent"),
@@ -233,7 +323,7 @@ linkedScatterMap <- function(input, output, session, sp_rx, plotly_event_rx) {
                 build <- plotly_build(g)
 
                 build$data[[1]]$text <- paste0(x_axis(),': ', as.character(sp_rx_id()[[x_axis()]]),'<br>',
-                                               y_axis(),': ', as.character(sp_rx_id()[[y_axis()]]),'<br>'
+                                               y_axis_control(),': ', as.character(sp_rx_id()[[y_axis_control()]]),'<br>'
                                                )
 
                 build
@@ -275,23 +365,6 @@ linkedScatterMap <- function(input, output, session, sp_rx, plotly_event_rx) {
 
         })
 
-
-        # observe({
-        #
-        #         shiny::req(sub()) # Do this if sub() is not null
-        #         shiny::req(var())
-        #
-        #         leafletProxy(ns('map')) %>%
-        #                 clearGroup(group = 'sub') %>%
-        #                 addPolygons(data = sub(), fill = FALSE, color = '#00FFFF',
-        #                             opacity = 1, group = 'sub') %>%
-        #                 addLayersControl(baseGroups = 'main',overlayGroups = 'sub',options = layersControlOptions(collapsed = TRUE))
-        #                 # fitBounds(lng1 = bbox(sub())[1],
-        #                 #           lat1 = bbox(sub())[2],
-        #                 #           lng2 = bbox(sub())[3],
-        #                 #           lat2 = bbox(sub())[4])
-        #
-        # })
 
 
 
