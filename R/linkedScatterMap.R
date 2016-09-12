@@ -1,72 +1,27 @@
-# library(sp)
-library(rgdal)
-library(plotly)
-library(gplots)
-library(ggplot2)
-library(GISTools)
-library(magrittr)
-library(shiny)
-library(plyr)
-library(dplyr)
-library(shinydashboard)
-library(leaflet)
+#' @title A map with an interactive scatter plot
+#'
+#' @description \code{linkedScatterMap} provides a set of functions to build a
+#' linked scatter plot-map module. It is currently set up for use in a
+#' \code{\link{shinydashboard}} framework.
+#'
+#' @param id The module's unique identifier (to be passed to \code{\link[shiny]{NS()}})
+#' @param menu_item_name Text to show for the menu item.
+#' @param tab_name The name of a tab that this menu item will activate.
+#' @param data A dataframe (or an object that can be correctly converted
+#'  to a dataframe by \code{as.data.frame()}) to be visualized as a scatterplot.
+#' @param cols Variables ("columns") from the dataframe to be visualized in the scatter plot (the select input boxes
+#'  map to these parameters).
+#' @return Functions ending in 'UI' return a string of HTML. The output types of non-UI functions varies.
+#' @import htmltools
+#' @import shiny
+#' @import ggplot2
+#' @export
+#' @name linkedScatterMap
 
-library(shmodules)
+NULL
 
-data(newhaven)
-
-crs_proj <- CRS("+init=epsg:4326")
-
-proj4string(tracts) <- proj4string(blocks)
-
-tracts %<>% spTransform(crs_proj)
-blocks %<>% spTransform(crs_proj)
-
-tracts@data %<>% mutate_at(vars(contains('P_')), funs(round_any(. * .01,.0001)))
-blocks@data %<>% mutate_at(vars(contains('P_')), funs(round_any(. * .01,.0001)))
-
-proj_light_grey <- col2hex("grey75")
-proj_grey <- col2hex("grey50")
-proj_dark_grey <- col2hex("grey25")
-proj_orange <- '#D59C40'
-
-myLflt <- function(){
-        leaflet() %>%
-                addTiles(
-                        urlTemplate = "//{s}.tiles.mapbox.com/v3/jcheng.map-5ebohr46/{z}/{x}/{y}.png",
-                        attribution = 'Maps by <a href="http://www.mapbox.com/">Mapbox</a>'
-                )
-}
-
-checkboxInputStyle <- function (inputId, label, value = FALSE, width = NULL, cssStyle = NULL){
-        value <- restoreInput(id = inputId, default = value)
-        inputTag <- tags$input(id = inputId, type = "checkbox")
-        if (!is.null(value) && value)
-                inputTag$attribs$checked <- "checked"
-        div(class = "form-group shiny-input-container",
-            style = paste0(
-                    ifelse(!is.null(width),paste0("width: ", validateCssUnit(width)),"")," ",
-                    ifelse(!is.null(cssStyle),cssStyle,"")
-            ),
-            div(class = "checkbox",
-                tags$label(inputTag, tags$span(label))))
-}
-
-columnStyle <- function(width, ..., offset = 0, cssStyle = NULL){
-        if (!is.numeric(width) || (width < 1) || (width > 12))
-                stop("column width must be between 1 and 12")
-        colClass <- paste0("col-sm-", width)
-        if (offset > 0)
-                colClass <- paste0(colClass, " col-sm-offset-", offset)
-        div(class = colClass,
-            style = paste0(
-                    ifelse(!is.null(cssStyle),
-                           cssStyle,
-                           "")),
-            ...)
-}
-
-
+#' @rdname linkedScatterMap
+#' @export
 linkedScatterMapSidebarTabUI <- function(id,menu_item_name,tab_name) {
         ns <- NS(id)
 
@@ -75,6 +30,8 @@ linkedScatterMapSidebarTabUI <- function(id,menu_item_name,tab_name) {
 
 }
 
+#' @rdname linkedScatterMap
+#' @export
 linkedScatterMapSidebarTabContentUI <- function(id,menu_item_name,tab_name, sp) {
         ns <- NS(id)
         # df <- sp %>% .@data %>% as.data.frame()
@@ -94,12 +51,12 @@ linkedScatterMapSidebarTabContentUI <- function(id,menu_item_name,tab_name, sp) 
                                                   selectizeInput(inputId = ns('var'),
                                                                  label = 'Select a variable',
                                                                  choices = names(df)
-                                                 )),
+                                                  )),
                                           columnStyle(
                                                   width = 3,
                                                   checkboxInputStyle(inputId = ns('linked_x'), label = 'Set x-axis', value = TRUE,cssStyle = "padding: 0px;"),
                                                   cssStyle = 'padding: 0px;')
-                                          ),
+                                 ),
                                  fluidRow(width = 12,
                                           plotlyOutput(ns('scatter'), width = "auto")),
                                  fluidRow(width = 12,
@@ -112,7 +69,7 @@ linkedScatterMapSidebarTabContentUI <- function(id,menu_item_name,tab_name, sp) 
                                                            column(width = 6,selectizeInput(inputId = ns('x_axis'),label = 'X:',choices = names(df))),
                                                            column(width = 6,
                                                                   selectizeInput(inputId = ns('y_axis'),label = 'Y:',choices = names(df))))
-                                          )
+                                 )
 
                 )
         )
@@ -121,6 +78,8 @@ linkedScatterMapSidebarTabContentUI <- function(id,menu_item_name,tab_name, sp) 
 
 }
 
+#' @rdname linkedScatterMap
+#' @export
 linkedScatterMapBodyUI <- function(id,tab_name) {
         ns <- NS(id)
 
@@ -142,11 +101,13 @@ linkedScatterMapBodyUI <- function(id,tab_name) {
                 )
 
 
-        )
+                                )
 
 
-}
+        }
 
+#' @rdname linkedScatterMap
+#' @export
 linkedScatterMap <- function(input, output, session, sp_rx, plotly_event_rx) {
 
         ns <- session$ns
@@ -171,7 +132,7 @@ linkedScatterMap <- function(input, output, session, sp_rx, plotly_event_rx) {
                         colorFactor('Set1',sp_rx()[[var()]] %>% as.character() %>% factor)
                 }
 
-                })
+        })
 
         x_axis <- reactive({
 
@@ -180,13 +141,13 @@ linkedScatterMap <- function(input, output, session, sp_rx, plotly_event_rx) {
                 }else{
                         input$x_axis %>% as.character() %>% toupper()
                 }
-                })
+        })
 
         y_axis_linked <- reactive({input$y_axis_linked %>% as.character() %>% toupper()})
 
         y_axis <- reactive({
                 input$y_axis %>% as.character() %>% toupper()
-                })
+        })
 
         y_axis_control <- reactive({
 
@@ -196,7 +157,7 @@ linkedScatterMap <- function(input, output, session, sp_rx, plotly_event_rx) {
                         input$y_axis %>% as.character() %>% toupper()
                 }
 
-                })
+        })
 
         linked_x <- reactive({input$linked_x})
 
@@ -323,7 +284,7 @@ linkedScatterMap <- function(input, output, session, sp_rx, plotly_event_rx) {
 
                 build$data[[1]]$text <- paste0(x_axis(),': ', as.character(sp_rx_id()[[x_axis()]]),'<br>',
                                                y_axis_control(),': ', as.character(sp_rx_id()[[y_axis_control()]]),'<br>'
-                                               )
+                )
 
                 build
 
@@ -374,4 +335,4 @@ linkedScatterMap <- function(input, output, session, sp_rx, plotly_event_rx) {
 
 
 
-        }
+}
