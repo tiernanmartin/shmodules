@@ -168,7 +168,7 @@ linkedScatterMap <- function(input, output, session, sp_rx, plotly_event_rx) {
                         colorNumeric(myYlOrRd,sp_rx()[[var()]])
                 }
                 else{
-                        colorFactor('Set1',sp_rx()[[var()]] %>% as.character() %>% factor)
+                        colorFactor('Spectral',sp_rx()[[var()]] %>% as.character() %>% factor)
                 }
 
                 })
@@ -233,7 +233,7 @@ linkedScatterMap <- function(input, output, session, sp_rx, plotly_event_rx) {
                 var1_type <- is.numeric(sp_rx_id()[[1]])
                 pal <- function(x){
                         if(var1_type){colorNumeric(myYlOrRd,sp_rx_id()[[var1]])}
-                        else{colorFactor('Set1',sp_rx_id()[[var1]] %>% as.character() %>% factor)}
+                        else{colorFactor('Spectral',sp_rx_id()[[var1]] %>% as.character() %>% factor)}
                 }
 
                 myLflt() %>%
