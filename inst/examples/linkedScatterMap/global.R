@@ -155,7 +155,7 @@ linkedScatterMap <- function(input, output, session, sp_rx, plotly_event_rx) {
 
         sp_rx_id <- reactive({
                 sp_id <- sp_rx()
-                sp_id@data <- cbind(sp_id@data,KEY = rownames(sp_id@data))
+                sp_id@data <- cbind(KEY = rownames(sp_id@data),sp_id@data)
                 return(sp_id)
         })
 
@@ -225,8 +225,17 @@ linkedScatterMap <- function(input, output, session, sp_rx, plotly_event_rx) {
         # Map
         output$map <- renderLeaflet({
 
+                myYlOrRd <- RColorBrewer::brewer.pal(9, "YlOrRd")[2:7]
                 var1 <- names(sp_rx_id())[[1]]
-                pal <- colorNumeric('Spectral',sp_rx_id()[[var1]])
+
+                # Check if the variable is numeric or something else,
+                # assign a color ramp accordingly
+                var1_type <- is.numeric(sp_rx_id()[[1]])
+                pal <- function(x){
+                        if(var1_type){colorNumeric(myYlOrRd,sp_rx_id()[[var1]])}
+                        else{colorFactor('Set1',sp_rx_id()[[var1]] %>% as.character() %>% factor)}
+                }
+
                 myLflt() %>%
                         addPolygons(data = sp_rx_id(),
                                     color = col2hex("white"),
@@ -237,7 +246,7 @@ linkedScatterMap <- function(input, output, session, sp_rx, plotly_event_rx) {
                                     smoothFactor = 0,
                                     group = 'main') %>%
                         addLegend(position = "bottomleft", opacity = .85,
-                                  pal = pal, values = sp_rx_id()[[var1]])
+                                  pal = pal(), values = sp_rx_id()[[var1]])
 
         })
 
