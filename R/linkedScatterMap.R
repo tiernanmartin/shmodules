@@ -42,34 +42,54 @@ linkedScatterMapSidebarTabContentUI <- function(id,menu_item_name,tab_name, sp) 
         cond_linked_x_F <- sprintf("input['%s'] == false", ns("linked_x"))
         cond_linked_x_T <- sprintf("input['%s'] == true", ns("linked_x"))
 
-        cols <- df %>% select_if(is.numeric) %>% names # note: requires numeric variables (ideal for scatter plotting)
         tagList(
                 conditionalPanel(condition = cond_tab,
-                                 fluidRow(width = 12,
-                                          columnStyle(
-                                                  width = 9,
-                                                  selectizeInput(inputId = ns('var'),
-                                                                 label = 'Select a variable',
-                                                                 choices = names(df)
-                                                  )),
-                                          columnStyle(
-                                                  width = 3,
-                                                  checkboxInputStyle(inputId = ns('linked_x'), label = 'Set x-axis', value = TRUE,cssStyle = "padding: 0px;"),
-                                                  cssStyle = 'padding: 0px;')
-                                 ),
-                                 fluidRow(width = 12,
-                                          plotlyOutput(ns('scatter'), width = "auto")),
-                                 fluidRow(width = 12,
-                                          conditionalPanel(condition = cond_linked_x_T,
-                                                           column(width = 6),
-                                                           column(width = 6,
-                                                                  selectizeInput(inputId = ns('y_axis_linked'),label = 'Y:',choices = names(df)))
-                                          ),
-                                          conditionalPanel(condition = cond_linked_x_F,
-                                                           column(width = 6,selectizeInput(inputId = ns('x_axis'),label = 'X:',choices = names(df))),
-                                                           column(width = 6,
-                                                                  selectizeInput(inputId = ns('y_axis'),label = 'Y:',choices = names(df))))
+                                 navbarPage("",
+                                            tabPanel(title = "Explore",
+                                                     fluidRow(width = 12,
+                                                              columnStyle(
+                                                                      width = 9,
+                                                                      selectizeInput(inputId = ns('var'),
+                                                                                     label = 'Select a variable',
+                                                                                     choices = names(df)
+                                                                      )),
+                                                              columnStyle(
+                                                                      width = 3,
+                                                                      checkboxInputStyle(inputId = ns('linked_x'), label = 'Set x-axis', value = TRUE,cssStyle = "padding: 0px;"),
+                                                                      cssStyle = 'padding: 0px;')
+                                                     ),
+                                                     fluidRow(width = 12,
+                                                              plotlyOutput(ns('scatter'), width = "auto")),
+                                                     fluidRow(width = 12,
+                                                              conditionalPanel(condition = cond_linked_x_T,
+                                                                               column(width = 6),
+                                                                               column(width = 6,
+                                                                                      selectizeInput(inputId = ns('y_axis_linked'),label = 'Y:',choices = names(df)))
+                                                              ),
+                                                              conditionalPanel(condition = cond_linked_x_F,
+                                                                               column(width = 6,selectizeInput(inputId = ns('x_axis'),label = 'X:',choices = names(df))),
+                                                                               column(width = 6,
+                                                                                      selectizeInput(inputId = ns('y_axis'),label = 'Y:',choices = names(df))))
+                                                     )
+                                            ),
+                                            tabPanel(title = "Style",
+                                                     fluidRow(width = 12,
+                                                              columnStyle(
+                                                                      width = 9,
+                                                                      selectizeInput(inputId = ns('pal'),
+                                                                                     label = 'Select a color palette',
+                                                                                     choices = c('Sequential',
+                                                                                                 'Divergent',
+                                                                                                 'Qualitative')
+                                                                      )),
+                                                              columnStyle(
+                                                                      width = 3,
+                                                                      checkboxInputStyle(inputId = ns('rev'), label = 'Reverse', value = FALSE,cssStyle = "padding: 0px;"),
+                                                                      cssStyle = 'padding: 0px;')
+                                                     )
+                                            )
                                  )
+
 
                 )
         )
@@ -111,6 +131,7 @@ linkedScatterMapBodyUI <- function(id,tab_name) {
 linkedScatterMap <- function(input, output, session, sp_rx, plotly_event_rx) {
 
         ns <- session$ns
+        myYlOrRd <- RColorBrewer::brewer.pal(9, "YlOrRd")[2:7]
 
         # Reactives
 
@@ -122,15 +143,45 @@ linkedScatterMap <- function(input, output, session, sp_rx, plotly_event_rx) {
 
         var <- reactive({input$var})
 
+        pal_choice <- reactive({
+                if(input$pal == 'Sequential'){
+                        pal_c <- RColorBrewer::brewer.pal(9, "YlOrRd")[2:7]
+                        # if(input$rev){rev(pal_c)
+
+                }else if(input$pal == 'Divergent'){
+                        pal_c <- RColorBrewer::brewer.pal(n = 10,name = 'Spectral')[2:9]
+                        # if(input$rev){rev(pal_c)
+
+                }else{
+                        pal_c <- RColorBrewer::brewer.pal(n = 9,name = 'Set1')
+                        # if(input$rev){rev(pal_c)}
+                }
+        })
+
+
+        pal_choice_rev <- reactive({
+                if(input$rev){
+                        rev(pal_choice())
+                }else pal_choice()
+        })
+
+
         colorpal <- reactive({
-                myYlOrRd <- RColorBrewer::brewer.pal(9, "YlOrRd")[2:7]
 
                 if(is.numeric(sp_rx()[[var()]])){
-                        colorNumeric(myYlOrRd,sp_rx()[[var()]])
+                        colorNumeric(pal_choice_rev(),sp_rx()[[var()]])
                 }
                 else{
-                        colorFactor('Spectral',sp_rx()[[var()]] %>% as.character() %>% factor)
+                        colorFactor(pal_choice_rev(),sp_rx()[[var()]] %>% as.character() %>% factor)
                 }
+
+
+                # if(is.numeric(sp_rx()[[var()]])){
+                #         colorNumeric(myYlOrRd,sp_rx()[[var()]])
+                # }
+                # else{
+                #         colorFactor('Spectral',sp_rx()[[var()]] %>% as.character() %>% factor)
+                # }
 
         })
 
@@ -160,6 +211,8 @@ linkedScatterMap <- function(input, output, session, sp_rx, plotly_event_rx) {
         })
 
         linked_x <- reactive({input$linked_x})
+
+
 
         # Rendered/Updated UI
 
