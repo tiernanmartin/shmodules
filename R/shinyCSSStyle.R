@@ -1,5 +1,8 @@
-#' @title Shiny UI function with 'style = ' arguments
-#' @description \code{shinyCSSStyle} extend several common UI functions by adding a argument for css styling of a single element.
+#' Shiny UI function with 'style = ' arguments
+#'
+#' \code{shinyCSSStyle} extend several common UI functions by adding a argument for css styling of a single element.
+#'
+#' The \code{sidebarCSS} function added a lengthy set of CSS styling changes to the shinydashboard sidebar element.
 #' @param inputId The module's unique identifier (to be passed to \code{\link[shiny]{NS()}}).
 #' @param label Display label for the control, or NULL for no label.
 #' @param value Initial value (TRUE or FALSE).

@@ -4,12 +4,15 @@
 \alias{checkboxInputStyle}
 \alias{columnStyle}
 \alias{shinyCSSStyle}
+\alias{sidebarCSS}
 \title{Shiny UI function with 'style = ' arguments}
 \usage{
 checkboxInputStyle(inputId, label, value = FALSE, width = NULL,
   cssStyle = NULL)
 
 columnStyle(width, ..., offset = 0, cssStyle = NULL)
+
+sidebarCSS()
 }
 \arguments{
 \item{inputId}{The module's unique identifier (to be passed to \code{\link[shiny]{NS()}}).}
@@ -31,5 +34,8 @@ The UI element (as HTML) with any specified CSS styling.
 }
 \description{
 \code{shinyCSSStyle} extend several common UI functions by adding a argument for css styling of a single element.
+}
+\details{
+The \code{sidebarCSS} function added a lengthy set of CSS styling changes to the shinydashboard sidebar element.
 }
 
