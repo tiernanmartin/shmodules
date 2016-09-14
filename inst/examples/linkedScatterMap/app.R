@@ -13,6 +13,7 @@ header <- dashboardHeader(title = "Map Template",titleWidth = "350px")
 
 sidebar <- dashboardSidebar(
         width = "350px",
+        sidebarCSS(),
         sidebarMenu(id = 'menu',
                     linkedScatterMapSidebarTabUI('scatmap','Map with scatter plot','first'),
                     linkedScatterMapSidebarTabUI('scatmap2','Map with scatter plot','second')
