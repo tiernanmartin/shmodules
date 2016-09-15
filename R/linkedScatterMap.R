@@ -376,19 +376,21 @@ linkedScatterMap <- function(input, output, session, sp_rx, plotly_event_rx) {
                                 sp_sel <- 'abcdefg' # a hack but it's working - set to something that can't be selected
 
                         }
-
-                        if (!(sp_sel %in% sp_rx_id()[['KEY']])) {
-
-                                return(NULL) # if there is not a match, do nothing as well
-
-                        } else {
-
-                                # Give back a sp data frame of the selected sp_rx_id
-                                sub <- sp_rx_id()[which(sp_rx_id()[['KEY']] %in% sp_sel), ]
-
-                                return(sub)
-
-                        }
+                        ifelse(sp_sel %!in% sp_rx_id()[['KEY']],
+                               return(NULL),
+                               return(sp_rx_id()[which(sp_rx_id()[['KEY']] %in% sp_sel), ]))
+                        # if (sp_sel %!in% sp_rx_id()[['KEY']]) {
+                        #
+                        #         return(NULL) # if there is not a match, do nothing as well
+                        #
+                        # } else {
+                        #
+                        #         # Give back a sp data frame of the selected sp_rx_id
+                        #         sub <- sp_rx_id()[which(sp_rx_id()[['KEY']] %in% sp_sel), ]
+                        #
+                        #         return(sub)
+                        #
+                        # }
 
                 }
 

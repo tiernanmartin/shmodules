@@ -259,6 +259,11 @@ Source: CRAN
 Version: 0.9.4
 Hash: 5ceb5d83bba44e8e5a764ac6ad32e9fb
 
+Package: operator.tools
+Source: CRAN
+Version: 1.4.4
+Hash: a436bd9e655cb29a8d6fd7e3509dbd97
+
 Package: packrat
 Source: CRAN
 Version: 0.4.7-1
