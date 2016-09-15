@@ -352,8 +352,8 @@ GithubSha1: a5787f99886bc4e3b8983c980436f9ccd5a6bb94
 
 Package: shinydashboard
 Source: CRAN
-Version: 0.5.1
-Hash: 3d9eaa2d45febd7c1237f93a4c7c210d
+Version: 0.5.2
+Hash: 93bf1db29d6103dda1833e0668186a32
 Requires: htmltools, shiny
 
 Package: sourcetools
