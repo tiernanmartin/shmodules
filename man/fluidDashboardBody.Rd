@@ -4,13 +4,13 @@
 \alias{fluidDashboardBody}
 \title{A dashboard body that automatically resizes when the sidebar is toggled}
 \usage{
-fluidDashboardBody(sidebarCollapsed = FALSE, ...)
+fluidDashboardBody(..., sidebarCollapsed = FALSE)
 }
 \arguments{
+\item{...}{Items to put in the dashboard body.}
+
 \item{sidebarCollapsed}{If \code{TRUE}, a javascript snippet will be inserted to collapse
 the sidebar when the app is launched.}
-
-\item{...}{Items to put in the dashboard body.}
 }
 \description{
 \code{fluidDashboardBody} inserts a javascript snippet at the beginning of

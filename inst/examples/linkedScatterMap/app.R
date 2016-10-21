@@ -26,8 +26,7 @@ sidebar <- dashboardSidebar(
 )
 
 
-body <- fluidDashboardBody(
-        sidebarCollapsed = T,
+body <- fluidDashboardBody(sidebarCollapsed = FALSE,
         tabItems(
                 linkedScatterMapBodyUI(id = 'scatmap',tab_name = 'first'),
                 linkedScatterMapBodyUI(id = 'scatmap2',tab_name = 'second')

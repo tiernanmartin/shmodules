@@ -6,15 +6,14 @@
 #'
 #' It also provides the option to begin the app with the sidebar collapsed (\code{sidebarCollapsed = TRUE}).
 #'
+#' @param ... Items to put in the dashboard body.
 #' @param sidebarCollapsed If \code{TRUE}, a javascript snippet will be inserted to collapse
 #'   the sidebar when the app is launched.
-#' @param ... Items to put in the dashboard body.
 #' @import htmltools
 #' @export
 
 
-fluidDashboardBody <- function(sidebarCollapsed = FALSE,...){
-
+fluidDashboardBody <- function(...,sidebarCollapsed = FALSE){
 
 
         htmltools::div(class = "content-wrapper",
