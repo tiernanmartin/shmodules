@@ -276,14 +276,23 @@ linkedScatterMapSidebarTabContentUI <- function(id,menu_item_name,tab_name, sp) 
                                                               plotlyOutput(ns('scatter'), width = "auto")),
                                                      fluidRow(width = 12,
                                                               conditionalPanel(condition = cond_linked_x_T,
-                                                                               column(width = 6),
-                                                                               column(width = 6,
-                                                                                      selectizeInput(inputId = ns('y_axis_linked'),label = 'Y:',choices = names(df)))
+                                                                               fluidRow(
+                                                                                       # column(width = 6),
+                                                                                       column(width = 12,
+                                                                                              selectizeInput(inputId = ns('y_axis_linked'),label = 'Y:',choices = names(df)))
+                                                                               )
+
                                                               ),
                                                               conditionalPanel(condition = cond_linked_x_F,
-                                                                               column(width = 6,selectizeInput(inputId = ns('x_axis'),label = 'X:',choices = names(df))),
-                                                                               column(width = 6,
-                                                                                      selectizeInput(inputId = ns('y_axis'),label = 'Y:',choices = names(df))))
+                                                                               fluidRow(
+                                                                                       column(width = 12,selectizeInput(inputId = ns('x_axis'),label = 'X:',choices = names(df)))
+                                                                               ),
+                                                                               fluidRow(
+                                                                                       column(width = 12,
+                                                                                              selectizeInput(inputId = ns('y_axis'),label = 'Y:',choices = names(df)))
+                                                                               )
+                                                                               )
+
                                                      )
                                                      ),
                                             tabPanel(title = "Style",

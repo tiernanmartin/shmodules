@@ -153,10 +153,6 @@ sidebarCSS <- function(){
                 -webkit-column-width: 50px; /* Chrome, Safari, Opera */
                 column-width: 50px;
                 }
-                .control-label {
-                display: none;
-                margin-bottom: 0px; height: 0px;
-                }
                 .navbar-default,.navbar-default .navbar-nav>li>a {
                 color: #FFFFFF !important;
                 opacity: .75 !important;

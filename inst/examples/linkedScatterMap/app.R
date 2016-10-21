@@ -44,12 +44,12 @@ server <- function(input, output, session) {
 
         plotly_event <- reactive({event_data('plotly_selected', source = 'source')})
 
-        callModule(module = linkedScatterMap,
+        callModule(module = linkedBarMap,
                    id = "scatmap",
                    sp_rx = reactive({tracts}),
                    plotly_event_rx = reactive({plotly_event()})
         )
-        callModule(module = linkedScatterMap,
+        callModule(module = linkedBarMap,
                    id = "scatmap2",
                    sp_rx = reactive({blocks}),
                    plotly_event_rx = reactive({plotly_event()})
