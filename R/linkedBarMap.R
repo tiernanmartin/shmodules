@@ -22,7 +22,7 @@ NULL
 
 #' @rdname linkedScatterMap
 #' @export
-linkedScatterMapSidebarTabUI <- function(id,menu_item_name,tab_name) {
+linkedBarMapSidebarTabUI <- function(id,menu_item_name,tab_name) {
         ns <- NS(id)
 
         menuItem(text = menu_item_name,tabName = tab_name, icon = icon("globe"))
@@ -32,7 +32,7 @@ linkedScatterMapSidebarTabUI <- function(id,menu_item_name,tab_name) {
 
 #' @rdname linkedScatterMap
 #' @export
-linkedScatterMapSidebarTabContentUI <- function(id,menu_item_name,tab_name, sp) {
+linkedBarMapSidebarTabContentUI <- function(id,menu_item_name,tab_name, sp) {
         ns <- NS(id)
         # df <- sp %>% .@data %>% as.data.frame()
         df <- as.data.frame(sp@data)
@@ -109,7 +109,7 @@ linkedScatterMapSidebarTabContentUI <- function(id,menu_item_name,tab_name, sp) 
 
 #' @rdname linkedScatterMap
 #' @export
-linkedScatterMapBodyUI <- function(id,tab_name) {
+linkedBarMapBodyUI <- function(id,tab_name) {
         ns <- NS(id)
 
         tabItem(tabName = tab_name,

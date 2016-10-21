@@ -2,17 +2,20 @@
 % Please edit documentation in R/linkedBarMap.R, R/linkedScatterMap.R
 \name{linkedScatterMap}
 \alias{linkedBarMap}
+\alias{linkedBarMapBodyUI}
+\alias{linkedBarMapSidebarTabContentUI}
+\alias{linkedBarMapSidebarTabUI}
 \alias{linkedScatterMap}
 \alias{linkedScatterMapBodyUI}
 \alias{linkedScatterMapSidebarTabContentUI}
 \alias{linkedScatterMapSidebarTabUI}
 \title{A map with an interactive scatter plot}
 \usage{
-linkedScatterMapSidebarTabUI(id, menu_item_name, tab_name)
+linkedBarMapSidebarTabUI(id, menu_item_name, tab_name)
 
-linkedScatterMapSidebarTabContentUI(id, menu_item_name, tab_name, sp)
+linkedBarMapSidebarTabContentUI(id, menu_item_name, tab_name, sp)
 
-linkedScatterMapBodyUI(id, tab_name)
+linkedBarMapBodyUI(id, tab_name)
 
 linkedBarMap(input, output, session, sp_rx, plotly_event_rx)
 
