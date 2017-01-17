@@ -27,8 +27,8 @@ Requires: RColorBrewer, maptools, rgeos, sp
 
 Package: R6
 Source: CRAN
-Version: 2.1.3
-Hash: 1a8313c9df76d2a06aa27c13a4a71c73
+Version: 2.2.0
+Hash: 712773a3439bd32db5c40938e1a9aac2
 
 Package: RColorBrewer
 Source: CRAN
@@ -185,8 +185,8 @@ Requires: R6, curl, jsonlite, mime, openssl
 
 Package: jsonlite
 Source: CRAN
-Version: 1.0
-Hash: f32817e181c39ede83fdd3e699348b69
+Version: 1.1
+Hash: 86d4b85b84421a4815f1bb4872e30ef4
 
 Package: knitr
 Source: CRAN
@@ -207,13 +207,13 @@ Hash: 3d6e7608e65bbf5cb170dab1e3c9ed8b
 Package: leaflet
 Source: github
 Version: 1.0.1.9004
-Hash: 5650a589453f9f58d558e4da2c412399
+Hash: 8c70f224ab97d9b2d18b5fcf6923276c
 Requires: RColorBrewer, base64enc, htmltools, htmlwidgets, magrittr,
     markdown, png, raster, scales, sp
 GithubRepo: leaflet
 GithubUsername: rstudio
 GithubRef: master
-GithubSha1: 79469e014115bdb5b356f342e60d917d83f59cdc
+GithubSha1: 381a663161f6336003d8d70184ac8e2bd3236879
 
 Package: magrittr
 Source: CRAN
@@ -242,6 +242,22 @@ Package: mime
 Source: CRAN
 Version: 0.5
 Hash: 463550cf44fb6f0a2359368f42eebe62
+
+Package: miniUI
+Source: CRAN
+Version: 0.1.1
+Hash: e85626581f80b1fe6c92a96ec348efc5
+Requires: htmltools, shiny
+
+Package: miscgis
+Source: github
+Version: 0.1.0
+Hash: 55362713c6085464812a6e1f0de132b7
+Requires: dplyr, leaflet, miniUI, shinydashboard, sp, tigris
+GithubRepo: miscgis
+GithubUsername: tiernanmartin
+GithubRef: master
+GithubSha1: bfff0806552ec5031eb4e7002bac17681b357120
 
 Package: mlbench
 Source: CRAN
@@ -287,6 +303,11 @@ Source: CRAN
 Version: 0.1-7
 Hash: 421d7d6e0fb4bd885ecbd909b6456b8b
 
+Package: rappdirs
+Source: CRAN
+Version: 0.3.1
+Hash: 7340cfebc77ad7b107a549a8635e64dd
+
 Package: raster
 Source: CRAN
 Version: 2.5-8
@@ -307,8 +328,8 @@ Requires: sp
 
 Package: rgeos
 Source: CRAN
-Version: 0.3-19
-Hash: 296946d066d25af73e8906da36a92a9e
+Version: 0.3-20
+Hash: 7417d1ed8568664c79fbe987f5745805
 Requires: sp
 
 Package: rmarkdown
@@ -341,25 +362,25 @@ Requires: RColorBrewer, Rcpp, dichromat, labeling, munsell, plyr
 
 Package: shiny
 Source: github
-Version: 0.14
-Hash: 2a24d100b97bb23138c4c26e486521f1
+Version: 0.14.1.9001
+Hash: cbc4d72b5c633406a42aa995ab20e62e
 Requires: R6, digest, htmltools, httpuv, jsonlite, mime, sourcetools,
     xtable
 GithubRepo: shiny
 GithubUsername: rstudio
 GithubRef: master
-GithubSha1: a5787f99886bc4e3b8983c980436f9ccd5a6bb94
+GithubSha1: e133290c574104ec67371dc555c0c56a40f1b1c6
 
 Package: shinydashboard
 Source: CRAN
-Version: 0.5.2
-Hash: 93bf1db29d6103dda1833e0668186a32
+Version: 0.5.3
+Hash: 6ec0688120d2dd4500b6561886f413a4
 Requires: htmltools, shiny
 
 Package: sourcetools
 Source: CRAN
-Version: 0.1.2
-Hash: 62282a43e8bc00a37e571a70e0b47006
+Version: 0.1.5
+Hash: 04ddeb1c288302222562326a471e2945
 
 Package: sp
 Source: CRAN
@@ -388,6 +409,18 @@ Source: CRAN
 Version: 0.6.0
 Hash: daf06bb30f2d9581e69609e0c0f7d38a
 Requires: Rcpp, dplyr, lazyeval, magrittr, stringi, tibble
+
+Package: tigris
+Source: CRAN
+Version: 0.3.3
+Hash: ffcab56fa2546f0a153915dfd9138e5f
+Requires: httr, magrittr, maptools, rappdirs, rgdal, rgeos, sp,
+    stringr, uuid
+
+Package: uuid
+Source: CRAN
+Version: 0.1-2
+Hash: 69acbbcf4dcff3a258f94de540214001
 
 Package: viridis
 Source: CRAN
