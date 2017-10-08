@@ -2,9 +2,10 @@
 % Please edit documentation in R/linkedScatter.R
 \name{linkedScatter}
 \alias{linkedScatter}
-\alias{linkedScatterBodyUI}
-\alias{linkedScatterSidebarContentUI}
 \alias{linkedScatterSidebarTabUI}
+\alias{linkedScatterSidebarContentUI}
+\alias{linkedScatterBodyUI}
+\alias{linkedScatter}
 \alias{scatterPlot}
 \title{A pair scatter plots with linked brushing}
 \usage{
@@ -39,4 +40,3 @@ Functions ending in 'UI' return a string of HTML. The output types of non-UI fun
 linked scatter plot module. It is currently set up for use in a
 \code{\link{shinydashboard}} framework.
 }
-

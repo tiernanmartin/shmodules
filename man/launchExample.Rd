@@ -17,4 +17,3 @@ launchExample(name, ...)
   located in the 'Help' documentation, but are too lengthy because they are
   shiny apps.
 }
-

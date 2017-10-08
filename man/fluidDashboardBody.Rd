@@ -19,4 +19,3 @@ body to automatically adjust its sizing when the sidebar button is toggled.
 
 It also provides the option to begin the app with the sidebar collapsed (\code{sidebarCollapsed = TRUE}).
 }
-
