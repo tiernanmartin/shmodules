@@ -1,7 +1,7 @@
 Package: shmodules
 Type: Package
 Title: A Collection of Shiny Modules for Data Exploration and Visualization
-Version: 0.0.4
+Version: 0.0.4-1
 Author: Tiernan Martin
 Maintainer: Tiernan Martin <tiernan.martin@gmail.com>
 Description: A collection of shiny modules for exploring and visualizing data.
