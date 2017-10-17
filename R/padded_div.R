@@ -9,7 +9,13 @@
 #' @import shiny
 #' @export
 padded_div <- function(..., pad_top = 0, pad_right = 20, pad_bottom = 20, pad_left = 20){
-  pad_string <- paste0("padding: ",paste(paste(c(pad_top,pad_right,pad_bottom, pad_left),"px",sep = ""),collapse = ";"))
+
+        args <- list("padding-top:" = paste0(pad_top,"px"),
+                     "padding-right:" = paste0(pad_right,"px"),
+                     "padding-bottom:" = paste0(pad_bottom,"px"),
+                     "padding-left:" = paste0(pad_left,"px"))
+
+        pad_string <- paste0(paste0(paste(lapply(names(args),c),lapply(args,c)),collapse = "; "),";")
 
   div(style = pad_string, ... )
 }
